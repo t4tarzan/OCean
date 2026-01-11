@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ocean-status": {
+      "command": "node",
+      "args": ["/opt/ocean/mcp-servers/ocean-status/index.js"],
+      "env": {
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PASSWORD": "OceanSecure2026!DB"
+      }
+    }
+  }
+}
