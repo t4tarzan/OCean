@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
 import pg from 'pg';
 const { Pool } = pg;
 
@@ -25,8 +31,8 @@ const server = new Server(
   }
 );
 
-// Define tools
-server.setRequestHandler('tools/list', async () => ({
+// List tools handler
+server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: 'get_ocean_status',
@@ -109,19 +115,11 @@ server.setRequestHandler('tools/list', async () => ({
         required: ['task_id'],
       },
     },
-    {
-      name: 'get_docker_status',
-      description: 'Get status of all Docker containers',
-      inputSchema: {
-        type: 'object',
-        properties: {},
-      },
-    },
   ],
 }));
 
-// Tool handlers
-server.setRequestHandler('tools/call', async (request) => {
+// Call tool handler
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   try {
@@ -141,9 +139,6 @@ server.setRequestHandler('tools/call', async (request) => {
       case 'mark_task_complete':
         return await markTaskComplete(args.task_id);
       
-      case 'get_docker_status':
-        return await getDockerStatus();
-      
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -160,8 +155,8 @@ server.setRequestHandler('tools/call', async (request) => {
   }
 });
 
-// Resource handlers
-server.setRequestHandler('resources/list', async () => ({
+// List resources handler
+server.setRequestHandler(ListResourcesRequestSchema, async () => ({
   resources: [
     {
       uri: 'ocean://status',
@@ -178,7 +173,8 @@ server.setRequestHandler('resources/list', async () => ({
   ],
 }));
 
-server.setRequestHandler('resources/read', async (request) => {
+// Read resource handler
+server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   const { uri } = request.params;
 
   if (uri === 'ocean://status') {
@@ -188,7 +184,7 @@ server.setRequestHandler('resources/read', async (request) => {
         {
           uri,
           mimeType: 'application/json',
-          text: JSON.stringify(status, null, 2),
+          text: status.content[0].text,
         },
       ],
     };
@@ -201,7 +197,7 @@ server.setRequestHandler('resources/read', async (request) => {
         {
           uri,
           mimeType: 'application/json',
-          text: JSON.stringify(decisions, null, 2),
+          text: decisions.content[0].text,
         },
       ],
     };
@@ -285,7 +281,6 @@ async function getPhaseProgress(phaseNumber) {
 }
 
 async function logDecision(decision) {
-  // First, ensure decisions table exists
   await pool.query(`
     CREATE TABLE IF NOT EXISTS decisions (
       id SERIAL PRIMARY KEY,
@@ -360,36 +355,6 @@ async function markTaskComplete(taskId) {
       },
     ],
   };
-}
-
-async function getDockerStatus() {
-  const { exec } = await import('child_process');
-  const { promisify } = await import('util');
-  const execAsync = promisify(exec);
-  
-  try {
-    const { stdout } = await execAsync('docker-compose ps --format json', {
-      cwd: '/opt/ocean',
-    });
-    
-    return {
-      content: [
-        {
-          type: 'text',
-          text: stdout,
-        },
-      ],
-    };
-  } catch (error) {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Error getting Docker status: ${error.message}`,
-        },
-      ],
-    };
-  }
 }
 
 // Start server
