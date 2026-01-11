@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Neo4j - Knowledge Graph Database
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: ocean-neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/OceanNeo4j2026!
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=2G
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - ocean-network
+
+  # Qdrant - Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ocean-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"  # HTTP API
+      - "6334:6334"  # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - ocean-network
+
+  # MinIO - Object Storage (for file uploads, images, etc.)
+  minio:
+    image: minio/minio:latest
+    container_name: ocean-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
+    environment:
+      - MINIO_ROOT_USER=oceanadmin
+      - MINIO_ROOT_PASSWORD=OceanMinio2026!
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - ocean-network
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  qdrant_data:
+  minio_data:
+
+networks:
+  ocean-network:
+    driver: bridge
