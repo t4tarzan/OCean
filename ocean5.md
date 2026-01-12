@@ -211,10 +211,10 @@ function FeatureCard({ feature, teamMembers, presence }) {
 ### 1.2 Live Presence System
 
 **Tasks:**
-- [ ] Implement WebSocket presence tracking
-- [ ] Add cursor sharing (optional)
-- [ ] Show who's working on what
-- [ ] Display activity indicators
+- [x] Implement WebSocket presence tracking
+- [x] Add cursor sharing (optional)
+- [x] Show who's working on what
+- [x] Display activity indicators
 
 **Deliverables:**
 
