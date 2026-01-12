@@ -1081,10 +1081,10 @@ export function usePatternInstaller() {
 ### 4.1 Achievement System
 
 **Tasks:**
-- [ ] Define achievement criteria
-- [ ] Implement achievement tracking
-- [ ] Build achievement UI
-- [ ] Add unlock rewards (MCPs, features)
+- [x] Define achievement criteria
+- [x] Implement achievement tracking
+- [x] Build achievement UI
+- [x] Add unlock rewards (MCPs, features)
 
 **Deliverables:**
 
