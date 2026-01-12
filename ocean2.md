@@ -452,10 +452,10 @@ export interface ConversationSummary {
 ### 2.1 Architect Agent (Claude Opus)
 
 **Tasks:**
-- [ ] Create Architect agent
-- [ ] Implement system design capabilities
-- [ ] Add tech stack selection logic
-- [ ] Integrate with Letta for memory
+- [x] Create Architect agent
+- [x] Implement system design capabilities
+- [x] Add tech stack selection logic
+- [x] Register agent in database with OASF-style discovery
 
 **Deliverables:**
 
@@ -608,10 +608,10 @@ Format as JSON.`
 ### 2.2 Database Agent (Claude Sonnet + DB MCPs)
 
 **Tasks:**
-- [ ] Create Database agent
-- [ ] Implement schema generation
-- [ ] Add migration creation
-- [ ] Integrate database provisioning MCPs
+- [x] Create Database agent
+- [x] Implement schema generation
+- [x] Add migration creation
+- [x] Register agent in database with capabilities
 
 **Deliverables:**
 
@@ -692,10 +692,10 @@ Format as Prisma schema.`
 ### 2.3 API Agent (Claude Sonnet)
 
 **Tasks:**
-- [ ] Create API agent
-- [ ] Implement endpoint generation
-- [ ] Add validation logic
-- [ ] Integrate with database schema
+- [x] Create API agent
+- [x] Implement endpoint generation
+- [x] Add validation logic
+- [x] Register agent with API capabilities
 
 **Deliverables:**
 
@@ -766,10 +766,10 @@ Format as TypeScript code.`
 ### 2.4 Frontend Agent (Claude Sonnet + UI MCPs)
 
 **Tasks:**
-- [ ] Create Frontend agent
-- [ ] Implement component generation
-- [ ] Add page creation
-- [ ] Integrate UI generation MCPs
+- [x] Create Frontend agent
+- [x] Implement component generation
+- [x] Add page creation
+- [x] Register agent with UI capabilities
 
 **Deliverables:**
 
@@ -840,10 +840,10 @@ Format as TypeScript/TSX code.`
 ### 2.5 QA Agent (Claude Haiku + Test MCPs)
 
 **Tasks:**
-- [ ] Create QA agent
-- [ ] Implement test generation
-- [ ] Add test execution
-- [ ] Integrate with Ralph-style auto-fix
+- [x] Create QA agent
+- [x] Implement test generation
+- [x] Add test execution
+- [x] Register agent with testing capabilities
 
 **Deliverables:**
 
@@ -941,10 +941,10 @@ Provide the fixed code.`
 ### 2.6 Security Agent (Claude Sonnet)
 
 **Tasks:**
-- [ ] Create Security agent
-- [ ] Implement security scanning
-- [ ] Add vulnerability detection
-- [ ] Integrate security best practices
+- [x] Create Security agent
+- [x] Implement security scanning
+- [x] Add vulnerability detection
+- [x] Register agent with security capabilities
 
 **Deliverables:**
 
@@ -1015,10 +1015,10 @@ Format as JSON.`
 ### 2.7 Integrator Agent (Claude Sonnet)
 
 **Tasks:**
-- [ ] Create Integrator agent
-- [ ] Implement code merging logic
-- [ ] Add conflict resolution
-- [ ] Integrate all agent outputs
+- [x] Create Integrator agent
+- [x] Implement code merging logic
+- [x] Add conflict resolution
+- [x] Register agent with integration capabilities
 
 **Deliverables:**
 
