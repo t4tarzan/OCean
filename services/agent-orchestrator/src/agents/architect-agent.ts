@@ -1,5 +1,6 @@
 import { BaseAgent } from './base-agent';
-import { AgentTask, TaskResult } from '../types';
+import { LettaEnhancedAgent, TaskContext, TaskResult } from './LettaEnhancedAgent';
+import { AgentTask } from '../types';
 import axios from 'axios';
 
 export class ArchitectAgent extends BaseAgent {
