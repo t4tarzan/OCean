@@ -876,10 +876,10 @@ export default function ReplayPlayer({ params }: { params: { id: string } }) {
 ### 3.1 Pattern Marketplace
 
 **Tasks:**
-- [ ] Build pattern browsing UI
-- [ ] Add pattern submission flow
-- [ ] Implement one-click installation
-- [ ] Add rating and reviews
+- [x] Build pattern browsing UI
+- [x] Add pattern submission flow
+- [x] Implement one-click installation
+- [x] Add rating and reviews
 
 **Deliverables:**
 
