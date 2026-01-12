@@ -75,8 +75,8 @@ export default async function DecisionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Decision Map</h1>
-          <p className="text-gray-600 mt-1">Track and visualize architecture decisions</p>
+          <h1 className="text-3xl font-bold text-gray-900">Architecture Decisions</h1>
+          <p className="text-gray-600 mt-1">Visual decision map and tracking</p>
         </div>
         <FileText className="text-cyan-600" size={32} />
       </div>

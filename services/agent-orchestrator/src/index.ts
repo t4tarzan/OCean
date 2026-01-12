@@ -112,6 +112,65 @@ app.get('/api/orchestrator/status', async (req, res) => {
   }
 });
 
+// AutoCoder integration endpoints
+app.post('/api/agents/request', async (req, res) => {
+  try {
+    const { agent_type, task, context, project_id } = req.body;
+    const orchestrator = await getOrchestrator();
+    
+    // Route request to appropriate agent
+    const result = await orchestrator.delegateTask(agent_type, {
+      description: task,
+      context,
+      projectId: project_id,
+      source: 'autocoder'
+    });
+    
+    res.json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/features/start', async (req, res) => {
+  try {
+    const { feature_id, feature_name, project_id } = req.body;
+    
+    await pool.query(`
+      INSERT INTO agent_tasks (agent_id, type, description, status, project_id, metadata)
+      VALUES (
+        (SELECT id FROM agents WHERE name = 'AutoCoder' LIMIT 1),
+        'feature',
+        $1,
+        'in_progress',
+        $2,
+        $3
+      )
+    `, [feature_name, project_id, JSON.stringify({ feature_id })]);
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/features/complete', async (req, res) => {
+  try {
+    const { feature_id, success, project_id } = req.body;
+    
+    await pool.query(`
+      UPDATE agent_tasks
+      SET status = $1, completed_at = NOW()
+      WHERE metadata->>'feature_id' = $2
+      AND project_id = $3
+    `, [success ? 'completed' : 'failed', feature_id.toString(), project_id]);
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 async function startServer() {
   try {
     // Connect to Redis message bus
