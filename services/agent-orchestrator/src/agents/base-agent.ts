@@ -79,7 +79,7 @@ export abstract class BaseAgent {
   // Send heartbeat
   private async sendHeartbeat(): Promise<void> {
     await db.query(
-      'UPDATE agents SET last_heartbeat = NOW() WHERE id = $1',
+      'UPDATE agents SET last_active = NOW() WHERE id = $1',
       [this.agent.id]
     );
   }
