@@ -122,4 +122,78 @@ Format your response as JSON with these sections.`
 
     return await this.processTask(task);
   }
+
+  private async analyzeRequirements(feature: any, memory: any): Promise<any> {
+    // Analyze feature requirements considering team's previous patterns
+    return {
+      complexity: this.assessComplexity(feature),
+      suggestedPatterns: memory?.patterns || [],
+      technicalConstraints: feature.constraints || [],
+      scalabilityNeeds: this.assessScalability(feature)
+    };
+  }
+
+  private assessComplexity(feature: any): string {
+    const description = feature.description || feature.toString();
+    if (description.length > 500) return 'high';
+    if (description.length > 200) return 'medium';
+    return 'low';
+  }
+
+  private assessScalability(feature: any): string {
+    // Simple heuristic for scalability assessment
+    const keywords = ['user', 'scale', 'concurrent', 'load', 'performance'];
+    const description = (feature.description || feature.toString()).toLowerCase();
+    const matches = keywords.filter(k => description.includes(k)).length;
+    if (matches >= 3) return 'high';
+    if (matches >= 1) return 'medium';
+    return 'low';
+  }
+
+  async notifyAgents(design: any, feature: any): Promise<void> {
+    // Notify Database Agent about schema needs
+    if (design.database) {
+      await this.sendMessage('database-agent', 'request', {
+        subject: 'Database schema needed',
+        body: 'System design complete. Please create database schema.',
+        design: design.database,
+        entities: design.entities
+      });
+    }
+
+    // Notify API Agent about endpoint needs
+    if (design.api) {
+      await this.sendMessage('api-agent', 'request', {
+        subject: 'API endpoints needed',
+        body: 'Architecture ready. Please implement API endpoints.',
+        endpoints: design.api.endpoints,
+        authentication: design.api.authentication
+      });
+    }
+
+    // Notify Frontend Agent about UI needs
+    if (design.frontend) {
+      await this.sendMessage('frontend-agent', 'request', {
+        subject: 'UI implementation needed',
+        body: 'Design complete. Please build frontend.',
+        pages: design.frontend.pages,
+        components: design.frontend.components
+      });
+    }
+  }
+
+  private async handleRequest(message: any): Promise<void> {
+    console.log(`Architect handling request: ${message.subject}`);
+    // Process architecture requests from other agents
+  }
+
+  private async handleResponse(message: any): Promise<void> {
+    console.log(`Architect received response: ${message.subject}`);
+    // Process responses from other agents
+  }
+
+  private async handleNotification(message: any): Promise<void> {
+    console.log(`Architect received notification: ${message.subject}`);
+    // Process notifications from other agents
+  }
 }
