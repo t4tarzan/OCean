@@ -182,18 +182,4 @@ Format your response as JSON with these sections.`
     }
   }
 
-  private async handleRequest(message: any): Promise<void> {
-    console.log(`Architect handling request: ${message.subject}`);
-    // Process architecture requests from other agents
-  }
-
-  private async handleResponse(message: any): Promise<void> {
-    console.log(`Architect received response: ${message.subject}`);
-    // Process responses from other agents
-  }
-
-  private async handleNotification(message: any): Promise<void> {
-    console.log(`Architect received notification: ${message.subject}`);
-    // Process notifications from other agents
-  }
 }

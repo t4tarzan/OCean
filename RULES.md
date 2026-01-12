@@ -47,10 +47,17 @@ cd /opt/ocean
 - Verify against acceptance criteria
 - Check database for updated state
 
-### Step 6: Document
-- Log decisions using `./scripts/log-decision.sh`
-- Update ocean[X].md with completion status
+### Step 6: Document & Commit
+- Log grouped decisions using `./scripts/log-decision.sh` (combine related work)
+- Update ocean[X].md with completion status (✅ or 🔄)
 - Update `prd_progress` table in database
+- **Commit and push to GitHub:**
+  ```bash
+  git add .
+  git commit -m "Phase X Week Y: [Brief description of grouped work]"
+  git push origin main
+  ```
+- Use dashboard logs section for detailed documentation, not new .md files
 
 ---
 
