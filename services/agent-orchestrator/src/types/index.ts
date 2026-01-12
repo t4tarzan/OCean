@@ -38,18 +38,18 @@ export interface Agent {
   type: AgentType;
   description?: string;
   status: AgentStatus;
-  capabilities: string[];
+  expertise: string[];
   tools: string[];
   mcps: string[];
   config?: Record<string, any>;
-  api_key?: string;
   last_heartbeat?: Date;
+  last_active?: Date;
   tasks_completed: number;
   tasks_failed: number;
   success_rate?: number;
   avg_response_time?: number;
   created_at: Date;
-  updated_at: Date;
+  updated_at?: Date;
 }
 
 export interface AgentTask {

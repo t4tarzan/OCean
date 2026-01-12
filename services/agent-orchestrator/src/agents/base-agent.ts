@@ -10,7 +10,7 @@ export abstract class BaseAgent {
   constructor(
     name: string,
     type: AgentType,
-    capabilities: string[],
+    expertise: string[],
     tools: string[] = [],
     mcps: string[] = []
   ) {
@@ -19,7 +19,7 @@ export abstract class BaseAgent {
       name,
       type,
       status: 'initializing',
-      capabilities,
+      expertise,
       tools,
       mcps,
       tasks_completed: 0,
@@ -37,20 +37,19 @@ export abstract class BaseAgent {
   async register(): Promise<void> {
     try {
       const result = await db.query(
-        `INSERT INTO agents (id, name, type, status, capabilities, tools, mcps, api_key)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `INSERT INTO agents (id, name, type, status, expertise, tools, mcps)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (id) DO UPDATE 
-         SET status = $3, updated_at = NOW()
+         SET status = $4, last_active = NOW()
          RETURNING *`,
         [
           this.agent.id,
           this.agent.name,
           this.agent.type,
           'idle',
-          this.agent.capabilities,
+          this.agent.expertise,
           this.agent.tools,
-          this.agent.mcps,
-          uuidv4(), // API key
+          this.agent.mcps
         ]
       );
 
