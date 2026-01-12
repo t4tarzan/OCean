@@ -17,22 +17,29 @@ import {
   ChevronLeft,
   ChevronRight,
   User,
-  LogOut
+  LogOut,
+  Activity,
+  PlayCircle,
+  ShoppingBag,
+  Trophy,
+  TrendingUp
 } from 'lucide-react';
 import { useState } from 'react';
 
 const navigation = [
   { name: 'Overview', href: '/', icon: LayoutDashboard },
-  { name: 'Phase Progress', href: '/phases', icon: GitBranch },
-  { name: 'Agent Ecosystem', href: '/agents', icon: Bot },
-  { name: 'Decision Map', href: '/decisions', icon: FileText },
+  { name: 'Projects', href: '/projects', icon: GitBranch },
+  { name: 'AI Agents', href: '/agents', icon: Bot },
+  { name: 'Activity Feed', href: '/feed', icon: Activity },
+  { name: 'Replay Sessions', href: '/replay', icon: PlayCircle },
+  { name: 'Pattern Marketplace', href: '/marketplace', icon: ShoppingBag },
+  { name: 'Achievements', href: '/achievements', icon: Trophy },
+  { name: 'Analytics', href: '/analytics-dashboard', icon: TrendingUp },
+  { name: 'Decisions', href: '/decisions', icon: FileText },
   { name: 'Knowledge Graph', href: '/knowledge', icon: Network },
-  { name: 'Pattern Marketplace', href: '/patterns', icon: Package },
-  { name: 'Team Collaboration', href: '/team', icon: Users },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'System Monitoring', href: '/system', icon: Database },
-  { name: 'Admin', href: '/admin', icon: Settings },
-  { name: 'Profile', href: '/profile', icon: User },
+  { name: 'Team', href: '/team', icon: Users },
+  { name: 'System', href: '/system', icon: Database },
+  { name: 'Settings', href: '/admin', icon: Settings },
 ];
 
 export default function Sidebar() {
