@@ -612,10 +612,10 @@ export class ActivityLogger {
 ### 2.2 Time-Travel Replay System
 
 **Tasks:**
-- [ ] Record coding sessions
-- [ ] Generate compressed replays
-- [ ] Build replay player
-- [ ] Add speed controls (10x, 20x)
+- [x] Record coding sessions
+- [x] Generate compressed replays
+- [x] Build replay player
+- [x] Add speed controls (10x, 20x)
 
 **Deliverables:**
 
