@@ -368,10 +368,10 @@ export class DecisionLogger {
 ### 2.1 Visual Decision Map
 
 **Tasks:**
-- [ ] Create Decision Map component
-- [ ] Implement graph visualization (React Flow)
-- [ ] Add interactive node exploration
-- [ ] Link to source files
+- [x] Create Decision Map component
+- [x] Implement graph visualization (React Flow)
+- [x] Add interactive node exploration
+- [x] Link to source files
 
 **Deliverables:**
 
