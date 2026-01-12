@@ -31,10 +31,10 @@ Phase 5 builds the social and collaborative features that make OCEAN feel like a
 ### 1.1 Enhanced Kanban Board
 
 **Tasks:**
-- [ ] Extend AutoCoder's Kanban with collaboration features
-- [ ] Add drag-and-drop for feature assignment
-- [ ] Implement real-time updates via WebSocket
-- [ ] Add team member avatars on cards
+- [x] Extend AutoCoder's Kanban with collaboration features
+- [x] Add drag-and-drop for feature assignment
+- [x] Implement real-time updates via WebSocket
+- [x] Add team member avatars on cards
 
 **Deliverables:**
 
