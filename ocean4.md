@@ -480,10 +480,10 @@ export class TeamMemoryManager {
 ### 3.1 Neo4j Knowledge Graph
 
 **Tasks:**
-- [ ] Design knowledge graph schema
-- [ ] Implement graph population from projects
-- [ ] Build relationship inference engine
-- [ ] Create graph query API
+- [x] Design knowledge graph schema
+- [x] Implement graph population from projects
+- [x] Build relationship inference engine
+- [x] Create graph query API
 
 **Deliverables:**
 
