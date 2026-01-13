@@ -38,3 +38,28 @@ minio_data/
 tmp/
 temp/
 *.tmp
+# Sensitive files
+*.env
+*.env.*
+!*.env.example
+.env.local
+.env.*.local
+
+# API Keys and secrets
+**/config.json
+**/.config/autocoder/
+
+# Git credentials
+.git-credentials
+
+# Documentation - ignore all .md files except specific public ones
+*.md
+!README.md
+!RULES.md
+!ocean-prd-overview.md
+!ocean1.md
+!ocean2.md
+!ocean3.md
+!ocean4.md
+!ocean5.md
+!ocean6.md

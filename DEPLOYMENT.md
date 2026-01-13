@@ -89,15 +89,21 @@ Secret Key: OceanMinio2026!
 
 ## API Keys Configuration
 
-All API keys are stored in `/opt/ocean/services/api-proxy/.env`:
+All API keys should be stored in environment variables or `.env` files (which are gitignored):
 
 ```bash
-# AI Provider API Keys
-CLAUDE_API_KEY=***REMOVED_ANTHROPIC_KEY***
-GEMINI_API_KEY=***REMOVED_GEMINI_KEY***
-OPENAI_API_KEY=***REMOVED_OPENAI_KEY***
-GROQ_API_KEY=***REMOVED_GROQ_KEY***
+# AI Provider API Keys - DO NOT COMMIT THESE
+CLAUDE_API_KEY=your_claude_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 ```
+
+**Important:** Never commit actual API keys to version control. Use:
+- Environment variables
+- `.env` files (add to `.gitignore`)
+- Secure secret management services
+- OCoder Settings page at `https://ocean.ocdevide.com/settings` for Anthropic keys
 
 ---
 
