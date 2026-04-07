@@ -1,12 +1,83 @@
 import { ApplicationMenu, BrowserView, BrowserWindow } from "electrobun/bun";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { homedir } from "node:os";
+import { exec } from "node:child_process";
 import type { MainRPC, EnrichParams, GhostParams } from "shared/rpc";
 
-// ── Anthropic API key ───────────────────────────────────────────────────────
-// Read from environment variable. User can set ANTHROPIC_API_KEY in their shell
-// profile or pass it when launching the app.
+// ── API key storage ─────────────────────────────────────────────────────────
+// Stored in ~/Library/Application Support/space.nodepad.app/config.json
+// Falls back to ANTHROPIC_API_KEY env var if no stored key.
+
+const CONFIG_DIR = join(
+  homedir(),
+  "Library",
+  "Application Support",
+  "space.nodepad.app"
+);
+const CONFIG_FILE = join(CONFIG_DIR, "config.json");
+
+interface AppConfig {
+  anthropicApiKey?: string;
+}
+
+function readConfig(): AppConfig {
+  try {
+    if (existsSync(CONFIG_FILE)) {
+      return JSON.parse(readFileSync(CONFIG_FILE, "utf-8"));
+    }
+  } catch {
+    // Corrupted config, start fresh
+  }
+  return {};
+}
+
+function writeConfig(config: AppConfig): void {
+  try {
+    if (!existsSync(CONFIG_DIR)) {
+      mkdirSync(CONFIG_DIR, { recursive: true });
+    }
+    writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), {
+      mode: 0o600, // Owner read/write only
+    });
+  } catch (e) {
+    console.error("Failed to write config:", e);
+  }
+}
 
 function getAnthropicKey(): string | null {
+  // 1. Stored key (from in-app entry)
+  const config = readConfig();
+  if (config.anthropicApiKey) return config.anthropicApiKey;
+  // 2. Environment variable fallback
   return process.env.ANTHROPIC_API_KEY || null;
+}
+
+function setAnthropicKey(key: string): boolean {
+  try {
+    const config = readConfig();
+    config.anthropicApiKey = key;
+    writeConfig(config);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function clearAnthropicKey(): boolean {
+  try {
+    const config = readConfig();
+    delete config.anthropicApiKey;
+    writeConfig(config);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function openExternal(url: string): void {
+  // macOS: use 'open' command
+  exec(`open "${url.replace(/"/g, '\\"')}"`);
 }
 
 // ── HMR: use Vite dev server if running, otherwise use bundled views ────────
@@ -388,8 +459,28 @@ const mainRPC = BrowserView.defineRPC<MainRPC>({
           return null;
         }
       },
-      getAnthropicKeyStatus: () => {
+      getApiKeyStatus: () => {
         return { hasKey: !!getAnthropicKey() };
+      },
+      setApiKey: ({ key }) => {
+        const trimmed = key.trim();
+        if (!trimmed) return { success: false };
+        const success = setAnthropicKey(trimmed);
+        if (success) console.log("API key saved successfully");
+        return { success };
+      },
+      clearApiKey: () => {
+        const success = clearAnthropicKey();
+        if (success) console.log("API key cleared");
+        return { success };
+      },
+      openExternalUrl: ({ url }) => {
+        try {
+          openExternal(url);
+          return { success: true };
+        } catch {
+          return { success: false };
+        }
       },
     },
     messages: {
@@ -423,6 +514,6 @@ mainWindow.on("close", () => {
 mainWindow.webview.on("dom-ready", () => {
   const hasKey = !!getAnthropicKey();
   console.log(
-    `Nodepad started. Anthropic API key: ${hasKey ? "configured" : "not set (set ANTHROPIC_API_KEY env var)"}`
+    `Nodepad started. API key: ${hasKey ? "configured" : "not set — user will be prompted in-app"}`
   );
 });

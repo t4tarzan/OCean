@@ -888,16 +888,8 @@ export function App() {
                 onClick={() => { setIsSidebarOpen(true); setJumpToSettings(true) }}
                 className="px-2.5 py-1 rounded bg-amber-700/60 hover:bg-amber-600/70 text-amber-100 font-medium transition-colors cursor-pointer border border-amber-600/50"
               >
-                Add API key →
+                Set up Claude →
               </button>
-              <a
-                href="https://openrouter.ai/keys"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="opacity-60 hover:opacity-90 transition-opacity underline underline-offset-2"
-              >
-                Get a key ↗
-              </a>
             </div>
           </div>
         )}

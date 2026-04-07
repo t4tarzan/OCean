@@ -314,9 +314,8 @@ export function ProjectSidebar({
                                   modelId: newModels[0]?.id ?? d.modelId,
                                   webGrounding: d.webGrounding,
                                   customBaseUrl: "",
-                                  // Restore the saved key for this provider if one exists,
-                                  // otherwise clear so the user knows to enter a new one.
-                                  apiKey: d.providerKeys?.[preset.id] ?? "",
+                                  // Anthropic uses system-managed key; others restore from saved keys
+                                  apiKey: preset.id === "anthropic" ? "system" : (d.providerKeys?.[preset.id] ?? ""),
                                 }))
                                 setProviderOpen(false)
                               }}
@@ -341,31 +340,90 @@ export function ProjectSidebar({
                   <label className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                     API Key
                   </label>
-                  <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2 focus-within:border-primary/50 transition-colors">
-                    <Key className="h-3 w-3 shrink-0 text-muted-foreground" />
-                    <input
-                      type="text"
-                      value={draft.apiKey}
-                      onChange={e => setDraft(d => ({ ...d, apiKey: e.target.value }))}
-                      placeholder={currentPreset.keyPlaceholder || "Your API key"}
-                      className="flex-1 bg-transparent font-mono text-[11px] text-foreground outline-none placeholder:text-muted-foreground/40"
-                      style={showKey ? undefined : { WebkitTextSecurity: "disc" } as never}
-                      autoComplete="off"
-                      spellCheck={false}
-                    />
-                    <button onClick={() => setShowKey(v => !v)} className="text-muted-foreground hover:text-foreground transition-colors">
-                      {showKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                    </button>
-                  </div>
-                  <p className="font-mono text-[9px] text-muted-foreground leading-relaxed">
-                    Stored locally. Never sent to a server.{" "}
-                    {currentPreset.keyUrl && (
-                      <a href={currentPreset.keyUrl} target="_blank" rel="noopener noreferrer"
-                        className="text-primary underline hover:brightness-125 transition-all">
-                        Get a key →
-                      </a>
-                    )}
-                  </p>
+                  {draft.provider === "anthropic" ? (
+                    /* Anthropic: key managed by Bun process, entered via RPC */
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2 focus-within:border-primary/50 transition-colors">
+                        <Key className="h-3 w-3 shrink-0 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={draft.apiKey === "system" ? "" : draft.apiKey}
+                          onChange={e => setDraft(d => ({ ...d, apiKey: e.target.value }))}
+                          placeholder="sk-ant-... (paste your Anthropic API key)"
+                          className="flex-1 bg-transparent font-mono text-[11px] text-foreground outline-none placeholder:text-muted-foreground/40"
+                          style={showKey ? undefined : { WebkitTextSecurity: "disc" } as never}
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                        <button onClick={() => setShowKey(v => !v)} className="text-muted-foreground hover:text-foreground transition-colors">
+                          {showKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={async () => {
+                            if (typeof window !== "undefined" && (window as any).__electrobun_rpc) {
+                              await (window as any).__electrobun_rpc.request.openExternalUrl({
+                                url: "https://console.anthropic.com/settings/keys"
+                              })
+                            }
+                          }}
+                          className="px-2 py-1 rounded bg-primary/20 hover:bg-primary/30 text-primary font-mono text-[10px] font-bold transition-colors border border-primary/30"
+                        >
+                          Get API Key →
+                        </button>
+                        {draft.apiKey && draft.apiKey !== "system" && (
+                          <button
+                            onClick={async () => {
+                              if (typeof window !== "undefined" && (window as any).__electrobun_rpc) {
+                                const { success } = await (window as any).__electrobun_rpc.request.setApiKey({
+                                  key: draft.apiKey
+                                })
+                                if (success) {
+                                  setDraft(d => ({ ...d, apiKey: "system" }))
+                                }
+                              }
+                            }}
+                            className="px-2 py-1 rounded bg-primary/20 hover:bg-primary/30 text-primary font-mono text-[10px] font-bold transition-colors border border-primary/30"
+                          >
+                            <Save className="h-3 w-3 inline mr-1" />Save Key
+                          </button>
+                        )}
+                      </div>
+                      <p className="font-mono text-[9px] text-muted-foreground leading-relaxed">
+                        Key is stored securely on your device. Works with Claude Max, Pro, or API plans.
+                      </p>
+                    </div>
+                  ) : (
+                    /* Other providers: standard key input */
+                    <>
+                      <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2 focus-within:border-primary/50 transition-colors">
+                        <Key className="h-3 w-3 shrink-0 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={draft.apiKey}
+                          onChange={e => setDraft(d => ({ ...d, apiKey: e.target.value }))}
+                          placeholder={currentPreset.keyPlaceholder || "Your API key"}
+                          className="flex-1 bg-transparent font-mono text-[11px] text-foreground outline-none placeholder:text-muted-foreground/40"
+                          style={showKey ? undefined : { WebkitTextSecurity: "disc" } as never}
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                        <button onClick={() => setShowKey(v => !v)} className="text-muted-foreground hover:text-foreground transition-colors">
+                          {showKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                        </button>
+                      </div>
+                      <p className="font-mono text-[9px] text-muted-foreground leading-relaxed">
+                        Stored locally. Never sent to a server.{" "}
+                        {currentPreset.keyUrl && (
+                          <a href={currentPreset.keyUrl} target="_blank" rel="noopener noreferrer"
+                            className="text-primary underline hover:brightness-125 transition-all">
+                            Get a key →
+                          </a>
+                        )}
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 {/* Model Selector */}

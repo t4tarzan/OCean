@@ -61,9 +61,21 @@ export type MainRPC = {
         params: GhostParams;
         response: GhostResponse;
       };
-      getAnthropicKeyStatus: {
+      getApiKeyStatus: {
         params: Record<string, never>;
         response: { hasKey: boolean };
+      };
+      setApiKey: {
+        params: { key: string };
+        response: { success: boolean };
+      };
+      clearApiKey: {
+        params: Record<string, never>;
+        response: { success: boolean };
+      };
+      openExternalUrl: {
+        params: { url: string };
+        response: { success: boolean };
       };
     };
     messages: {
