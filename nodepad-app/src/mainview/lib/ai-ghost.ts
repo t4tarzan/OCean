@@ -19,6 +19,18 @@ export async function generateGhostClient(
   const config = loadAIConfig()
   if (!config) throw new Error("No API key configured")
 
+  // Anthropic provider: route through Bun process RPC
+  if (config.provider === "anthropic") {
+    if (typeof window !== "undefined" && (window as any).__electrobun_rpc) {
+      const result = await (window as any).__electrobun_rpc.request.generateGhost({
+        context, previousSyntheses
+      })
+      if (!result) throw new Error("Ghost generation failed via Anthropic")
+      return result as GhostResult
+    }
+    throw new Error("Anthropic provider requires Electrobun desktop app")
+  }
+
   // Ghost falls back to a lighter model if none is set
   const model = config.modelId || "google/gemini-2.0-flash-lite-001"
 

@@ -226,6 +226,18 @@ export async function enrichBlockClient(
   const config = loadAIConfig()
   if (!config) throw new Error("No API key configured")
 
+  // Anthropic provider: route through Bun process RPC
+  if (config.provider === "anthropic") {
+    if (typeof window !== "undefined" && (window as any).__electrobun_rpc) {
+      const result = await (window as any).__electrobun_rpc.request.enrichBlock({
+        text, context, forcedType, category
+      })
+      if (!result) throw new Error("Enrichment failed via Anthropic")
+      return result as EnrichResult
+    }
+    throw new Error("Anthropic provider requires Electrobun desktop app")
+  }
+
   const detectedType = detectContentType(text)
   const effectiveType = forcedType || detectedType
   const shouldGround = config.supportsGrounding && TRUTH_DEPENDENT_TYPES.has(effectiveType)

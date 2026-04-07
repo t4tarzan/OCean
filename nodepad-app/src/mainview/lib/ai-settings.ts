@@ -11,7 +11,7 @@ export interface AIModel {
   groundingModelId?: string
 }
 
-export type AIProvider = "openrouter" | "openai" | "zai"
+export type AIProvider = "anthropic" | "openrouter" | "openai" | "zai"
 
 export interface AIProviderPreset {
   id: AIProvider
@@ -22,6 +22,13 @@ export interface AIProviderPreset {
 }
 
 export const AI_PROVIDER_PRESETS: AIProviderPreset[] = [
+  {
+    id: "anthropic",
+    label: "Anthropic (Claude)",
+    baseUrl: "https://api.anthropic.com/v1",
+    keyUrl: "https://console.anthropic.com/settings/keys",
+    keyPlaceholder: "Uses system ANTHROPIC_API_KEY — no key needed here",
+  },
   {
     id: "openrouter",
     label: "OpenRouter",
@@ -158,14 +165,25 @@ export const ZAI_MODELS: AIModel[] = [
   },
 ]
 
+export const ANTHROPIC_MODELS: AIModel[] = [
+  {
+    id: "claude-sonnet-4-5-20250514",
+    label: "Claude Sonnet 4.5",
+    shortLabel: "Claude",
+    description: "Best reasoning & annotation quality (via system API key)",
+    supportsGrounding: false,
+  },
+]
+
 export function getModelsForProvider(provider: AIProvider): AIModel[] {
+  if (provider === "anthropic") return ANTHROPIC_MODELS
   if (provider === "openai") return OPENAI_MODELS
   if (provider === "zai")    return ZAI_MODELS
   return AI_MODELS // openrouter + safe fallback for any stale localStorage value
 }
 
-export const DEFAULT_MODEL_ID = "openai/gpt-4o"
-export const DEFAULT_PROVIDER: AIProvider = "openrouter"
+export const DEFAULT_MODEL_ID = "claude-sonnet-4-5-20250514"
+export const DEFAULT_PROVIDER: AIProvider = "anthropic"
 
 export interface AISettings {
   apiKey: string
@@ -180,15 +198,23 @@ export interface AISettings {
 const STORAGE_KEY = "nodepad-ai-settings"
 
 function loadSettings(): AISettings {
-  if (typeof window === "undefined") {
-    return { apiKey: "", modelId: DEFAULT_MODEL_ID, webGrounding: false, provider: DEFAULT_PROVIDER, customBaseUrl: "" }
+  const defaults: AISettings = {
+    apiKey: DEFAULT_PROVIDER === "anthropic" ? "system" : "",
+    modelId: DEFAULT_MODEL_ID,
+    webGrounding: false,
+    provider: DEFAULT_PROVIDER,
+    customBaseUrl: "",
   }
+  if (typeof window === "undefined") return defaults
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { apiKey: "", modelId: DEFAULT_MODEL_ID, webGrounding: false, provider: DEFAULT_PROVIDER, customBaseUrl: "" }
-    return { apiKey: "", modelId: DEFAULT_MODEL_ID, webGrounding: false, provider: DEFAULT_PROVIDER, customBaseUrl: "", ...JSON.parse(raw) }
+    if (!raw) return defaults
+    const loaded = { ...defaults, ...JSON.parse(raw) }
+    // Anthropic provider always has a "system" key (managed by Bun process)
+    if (loaded.provider === "anthropic") loaded.apiKey = "system"
+    return loaded
   } catch {
-    return { apiKey: "", modelId: DEFAULT_MODEL_ID, webGrounding: false, provider: DEFAULT_PROVIDER, customBaseUrl: "" }
+    return defaults
   }
 }
 
@@ -202,6 +228,12 @@ export interface AIConfig {
 
 export function loadAIConfig(): AIConfig | null {
   const s = loadSettings()
+  // Anthropic provider uses system API key (in Bun process), no user key needed
+  if (s.provider === "anthropic") {
+    const models = getModelsForProvider("anthropic")
+    const modelId = models[0]?.id ?? s.modelId
+    return { apiKey: "system", modelId, supportsGrounding: false, provider: "anthropic", customBaseUrl: "" }
+  }
   if (!s.apiKey) return null
   const models = getModelsForProvider(s.provider)
   const model = models.find(m => m.id === s.modelId)
@@ -250,11 +282,10 @@ export function getAIHeaders(): Record<string, string> {
 
 export function useAISettings() {
   // Always start with the SSR-safe default so server and client render identically.
-  // Load the real localStorage value after mount to avoid hydration mismatches
-  // caused by settings.apiKey toggling conditional DOM blocks (API key banner,
-  // modelLabel prop, etc.) between the server render and client hydration.
+  // For Anthropic provider, set a placeholder key so the "add API key" banner is hidden.
   const [settings, setSettings] = useState<AISettings>({
-    apiKey: "", modelId: DEFAULT_MODEL_ID, webGrounding: false,
+    apiKey: DEFAULT_PROVIDER === "anthropic" ? "system" : "",
+    modelId: DEFAULT_MODEL_ID, webGrounding: false,
     provider: DEFAULT_PROVIDER, customBaseUrl: "",
   })
 
